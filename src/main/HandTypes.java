@@ -1,3 +1,4 @@
+package main;
 
 public enum HandTypes {
     HIGH_CARD,
