@@ -38,16 +38,20 @@ public class PokerHands {
         Hand hand1 = new Hand();
         Hand hand2 = new Hand();
 
-        // Keep polling until proper hands are provided
-        while(!poll(scan, hand1, hand2));
+        while(true) {
+            // Keep polling until proper hands are provided
+            while (!poll(scan, hand1, hand2)) ;
 
-        calculateHand(hand1);
-        calculateHand(hand2);
+            calculateHand(hand1);
+            calculateHand(hand2);
 
-        System.out.println(compareHands(hand1, hand2));
+            System.out.println(compareHands(hand1, hand2));
 
-        System.out.println("Press enter to exit: ");
-        scan.nextLine();
+            System.out.print("Continue? (y/n): ");
+            String in = scan.nextLine();
+            if (in.toUpperCase().equals("Y")) continue;
+            else break;
+        }
     }
 
     public boolean poll(Scanner scan, Hand p1Hand, Hand p2Hand) {
@@ -90,6 +94,10 @@ public class PokerHands {
             return false;
         }
         return true;
+    }
+
+    public int valueOf(String value) {
+        return validValues.indexOf(value);
     }
 
     public Pair<Boolean, String> checkHand(Hand hand) {
@@ -193,7 +201,7 @@ public class PokerHands {
                 }
             }
             // Check high card
-            else if (validValues.indexOf(hand.highCardValue) < validValues.indexOf(entry.getKey())) {
+            else if (valueOf(hand.highCardValue) < valueOf(entry.getKey())) {
                 hand.highCardValue = entry.getKey();
             }
         }
@@ -205,8 +213,8 @@ public class PokerHands {
             TreeSet<String> keySet = new TreeSet<>(values.keySet());
             int prevIndex = -1;
             for (String value : keySet) {
-                if (prevIndex == -1 || prevIndex + 1 == validValues.indexOf(value)) {
-                    prevIndex = validValues.indexOf(value);
+                if (prevIndex == -1 || prevIndex + 1 == valueOf(value)) {
+                    prevIndex = valueOf(value);
                 }
                 else {
                     isStraight = false;
@@ -240,17 +248,17 @@ public class PokerHands {
         }
         else {
             if (h1.type == HandTypes.STRAIGHT_FLUSH) {
-                if (validValues.indexOf(h1.highCardValue) > validValues.indexOf(h2.highCardValue)) {
+                if (valueOf(h1.highCardValue) > valueOf(h2.highCardValue)) {
                     String win = h1.type.name().replace("_", " ");
                     return String.format("Player 1 wins with a %s-high %s!\n", h1.highCardValue, win);
                 }
-                else if (validValues.indexOf(h1.highCardValue) < validValues.indexOf(h2.highCardValue)) {
+                else if (valueOf(h1.highCardValue) < valueOf(h2.highCardValue)) {
                     String win = h2.type.name().replace("_", " ");
                     return String.format("Player 2 wins with a %s-high %s!\n", h2.highCardValue, win);
                 }
             }
             else if (h1.type == HandTypes.FOUR_OF_A_KIND) {
-                if (validValues.indexOf(h1.quadValue) > validValues.indexOf(h2.quadValue)) {
+                if (valueOf(h1.quadValue) > valueOf(h2.quadValue)) {
                     String win = h1.type.name().replace("_", " ");
                     return String.format("Player 1 wins with a %s %s!\n", h1.quadValue, win);
                 }
@@ -260,29 +268,160 @@ public class PokerHands {
                 }
             }
             else if (h1.type == HandTypes.FULL_HOUSE) {
-                if (validValues.indexOf(h1.tripValue) > validValues.indexOf(h2.tripValue)) {
+                if (valueOf(h1.tripValue) > valueOf(h2.tripValue)) {
                     String win = h1.type.name().replace("_", " ");
-                    return String.format("Player 1 wins with a stronger %s!\n", h1.tripValue, win);
+                    return String.format("Player 1 wins with a stronger %s!\n", win);
                 }
-                else if (validValues.indexOf(h1.tripValue) < validValues.indexOf(h2.tripValue)) {
+                else if (valueOf(h1.tripValue) < valueOf(h2.tripValue)) {
                     String win = h2.type.name().replace("_", " ");
-                    return String.format("Player 2 wins with a stronger %s!\n", h2.tripValue, win);
+                    return String.format("Player 2 wins with a stronger %s!\n", win);
                 }
-                else if (validValues.indexOf(h1.tripValue) == validValues.indexOf(h2.tripValue) &&
-                         validValues.indexOf(h1.pair1Value) > validValues.indexOf(h2.pair1Value)) {
+                else if (valueOf(h1.tripValue) == valueOf(h2.tripValue) &&
+                         valueOf(h1.pair1Value) > valueOf(h2.pair1Value)) {
                     String win = h1.type.name().replace("_", " ");
-                    return String.format("Player 1 wins with a stronger %s!\n", h1.quadValue, win);
+                    return String.format("Player 1 wins with a stronger %s!\n", win);
                 }
-                else if (validValues.indexOf(h1.tripValue) == validValues.indexOf(h2.tripValue) &&
-                        validValues.indexOf(h1.pair1Value) < validValues.indexOf(h2.pair1Value)) {
+                else if (valueOf(h1.tripValue) == valueOf(h2.tripValue) &&
+                        valueOf(h1.pair1Value) < valueOf(h2.pair1Value)) {
                     String win = h2.type.name().replace("_", " ");
-                    return String.format("Player 2 wins with a stronger %s!\n", h2.quadValue, win);
+                    return String.format("Player 2 wins with a stronger %s!\n", win);
                 }
             }
             else if (h1.type == HandTypes.FLUSH) {
-                return "";
+                // Compare each card from high to low, hand should already be sorted from low to high
+                for (int i = h1.hand.size() - 1; i >= 0; --i) {
+                    if (valueOf(h1.hand.get(i)) > valueOf(h2.hand.get(i))) {
+                        String win = h1.type.name().replace("_", " ");
+                        return String.format("Player 1 wins with a stronger %s!\n", win);
+                    }
+                    else if (valueOf(h1.hand.get(i)) < valueOf(h2.hand.get(i))) {
+                        String win = h2.type.name().replace("_", " ");
+                        return String.format("Player 2 wins with a stronger %s!\n", win);
+                    }
+                }
+            }
+            else if (h1.type == HandTypes.STRAIGHT) {
+                if (valueOf(h1.highCardValue) > valueOf(h2.highCardValue)) {
+                    String win = h1.type.name().replace("_", " ");
+                    return String.format("Player 1 wins with a %s-high %s!\n", h1.highCardValue, win);
+                }
+                else if (valueOf(h1.highCardValue) < valueOf(h2.highCardValue)) {
+                    String win = h2.type.name().replace("_", " ");
+                    return String.format("Player 2 wins with a stronger %s!\n", h2.highCardValue, win);
+                }
+            }
+            else if (h1.type == HandTypes.THREE_OF_A_KIND) {
+                if (valueOf(h1.tripValue) > valueOf(h2.tripValue)) {
+                    String win = h1.type.name().replace("_", " ");
+                    return String.format("Player 1 wins with a %s, %ss!\n", win, h1.tripValue);
+                }
+                else if (valueOf(h1.tripValue) < valueOf(h2.tripValue)) {
+                    String win = h2.type.name().replace("_", " ");
+                    return String.format("Player 2 wins with a %s, %ss!\n", win, h2.tripValue);
+                }
+                else {
+                    // Comparing hands from high to low will determine who has higher matched cards
+                    for (int i = h1.hand.size() - 1; i >= 0; --i) {
+                        if (valueOf(h1.hand.get(i)) > valueOf(h2.hand.get(i))) {
+                            String win = h1.type.name().replace("_", " ");
+                            return String.format("Player 1 wins with a stronger %s, %ss!\n", win, h1.tripValue);
+                        }
+                        else if (valueOf(h1.hand.get(i)) < valueOf(h2.hand.get(i))) {
+                            String win = h2.type.name().replace("_", " ");
+                            return String.format("Player 2 wins with a stronger %s, %ss!\n", win, h2.tripValue);
+                        }
+                    }
+                }
+            }
+            else if (h1.type == HandTypes.TWO_PAIR) {
+                int h1High, h1Low, h2High, h2Low;
+                int h1p1v = valueOf(h1.pair1Value);
+                int h1p2v = valueOf(h1.pair2Value);
+                int h2p1v = valueOf(h2.pair1Value);
+                int h2p2v = valueOf(h2.pair2Value);
+                if (h1p1v > h1p2v) {
+                    h1High = h1p1v;
+                    h1Low = h1p2v;
+                }
+                else {
+                    h1High = h1p2v;
+                    h1Low = h1p1v;
+                }
+                if (h2p1v > h2p2v) {
+                    h2High = h2p1v;
+                    h2Low = h2p2v;
+                }
+                else {
+                    h2High = h2p2v;
+                    h2Low = h2p1v;
+                }
+
+                if (h1High > h2High) {
+                    String win = h1.type.name().replace("_", " ");
+                    return String.format("Player 1 wins with a stronger %s!\n", win);
+                }
+                else if (h1High < h2High) {
+                    String win = h2.type.name().replace("_", " ");
+                    return String.format("Player 2 wins with a stronger %s!\n", win);
+                }
+                else {
+                    if (h1Low > h2Low) {
+                        String win = h1.type.name().replace("_", " ");
+                        return String.format("Player 1 wins with a stronger %s!\n", win);
+                    }
+                    else if (h1Low < h2Low) {
+                        String win = h2.type.name().replace("_", " ");
+                        return String.format("Player 2 wins with a stronger %s!\n", win);
+                    }
+                    else {
+                        if (valueOf(h1.highCardValue) > valueOf(h2.highCardValue)) {
+                            String win = h1.type.name().replace("_", " ");
+                            return String.format("Player 1 wins with a stronger %s!\n", win);
+                        }
+                        else if (valueOf(h1.highCardValue) < valueOf(h2.highCardValue)) {
+                            String win = h2.type.name().replace("_", " ");
+                            return String.format("Player 2 wins with a stronger %s!\n", win);
+                        }
+                    }
+                }
+            }
+            else if (h1.type == HandTypes.ONE_PAIR) {
+                if (valueOf(h1.pair1Value) > valueOf(h2.pair1Value)) {
+                    String win = h1.type.name().replace("_", " ");
+                    return String.format("Player 1 wins with a %s of %s!\n", win, h1.pair1Value);
+                }
+                else if (valueOf(h1.pair1Value) < valueOf(h2.pair1Value)) {
+                    String win = h2.type.name().replace("_", " ");
+                    return String.format("Player 2 wins with a %s of %s!\n", win, h2.pair1Value);
+                }
+                else {
+                    for (int i = h1.hand.size() - 1; i >= 0; --i) {
+                        if (valueOf(h1.hand.get(i)) > valueOf(h2.hand.get(i))) {
+                            String win = h1.type.name().replace("_", " ");
+                            return String.format("Player 1 wins with a stronger %s of %s!\n", win, h1.pair1Value);
+                        }
+                        else if (valueOf(h1.hand.get(i)) < valueOf(h2.hand.get(i))) {
+                            String win = h2.type.name().replace("_", " ");
+                            return String.format("Player 2 wins with a stronger %s or %s!\n", win, h2.pair1Value);
+                        }
+                    }
+                }
+            }
+            else if (h1.type == HandTypes.HIGH_CARD) {
+                for (int i = h1.hand.size(); i >= 0; --i) {
+                    if (valueOf(h1.hand.get(i)) > valueOf(h2.hand.get(i))) {
+                        return String.format("Player 1 wins with a stronger card of %s!\n", h1.hand.get(i));
+                    }
+                    else if (valueOf(h1.hand.get(i)) < valueOf(h2.hand.get(i))) {
+                        return String.format("Player 2 wins with a stronger card of %s!\n", h2.hand.get(i));
+                    }
+                }
+            }
+            else {
+                String win = h1.type.name().replace("_", " ");
+                return String.format("Invalid hand type found: %s", win);
             }
         }
-        return "";
+        return "Player 1 and Player 2 have tied!";
     }
 }
