@@ -13,6 +13,9 @@ The best way to probably run this code is to open the folder as an IntelliJ proj
 Post Mortem -
 This application took me longer than expected to write, since this was the first Java application I had written from start to finish in many years.
 A good amount of time was spent relearning both IntelliJ as well as JUnit and Java in general; much of the coding process was slowed due to my unfamiliarity.
+Though I did not find anything about the problem to be particularly difficult, I found that covering all the edge cases in regards to ties took a lot of time to thoroughly cover.
+Initially, I considered having Jokers be available as wild cards, but the added complexity of wild cards in regards to those edge cases as well as a multitude of different rulesets regarding wild cards caused me to stick to the classic 52-card deck.
+
 In total, I would estimate between 10-12 hours in total for this project.
 A rough breakdown of my hours are as follows:
 - Code design and data structures: 1.5h
