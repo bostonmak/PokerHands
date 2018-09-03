@@ -345,6 +345,7 @@ public class PokerHands {
                     String win = hand2.type.name().replace("_", " ");
                     return String.format("Player 2 wins with a %s, %ss!\n", win, hand2.tripValue);
                 }
+                // this case shouldnt even happen in standard 5-card poker
                 else {
                     // Comparing hands from high to low will determine who has higher matched cards
                     for (int i = hand1.hand.size() - 1; i >= 0; --i) {
@@ -428,7 +429,7 @@ public class PokerHands {
                         }
                         else if (valueOf(getCardValue(hand1.hand.get(i))) < valueOf(getCardValue(hand2.hand.get(i)))) {
                             String win = hand2.type.name().replace("_", " ");
-                            return String.format("Player 2 wins with a stronger %s or %s!\n", win, hand2.pair1Value);
+                            return String.format("Player 2 wins with a stronger %s of %s!\n", win, hand2.pair1Value);
                         }
                     }
                 }
@@ -445,9 +446,9 @@ public class PokerHands {
             }
             else {
                 String win = hand1.type.name().replace("_", " ");
-                return String.format("Invalid hand type found: %s", win);
+                return String.format("Invalid hand type found: %s\n", win);
             }
         }
-        return "Player 1 and Player 2 have tied!";
+        return "Player 1 and Player 2 have tied!\n";
     }
 }
