@@ -16,11 +16,32 @@ public class PokerHands {
     private Hand hand1;
     private Hand hand2;
     private static PokerHands instance = null;
-    private List<String> validValues = new ArrayList<>(
-                Arrays.asList("2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K", "A"));
-    private List<String> validSuits = new ArrayList<>(Arrays.asList("D", "C", "H", "S"));
+    private List<String> validValues;
+    private List<String> validSuits;
 
     private final int HAND_SIZE = 5;
+
+    private PokerHands() {
+        validValues = new ArrayList<>(Arrays.asList("2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K", "A"));
+        validSuits = new ArrayList<>(Arrays.asList("D", "C", "H", "S"));
+    }
+
+    // auto-generated getters/setters
+    public List<String> getValidValues() {
+        return validValues;
+    }
+
+    public List<String> getValidSuits() {
+        return validSuits;
+    }
+
+    public void setHand1(Hand hand1) {
+        this.hand1 = hand1;
+    }
+
+    public void setHand2(Hand hand2) {
+        this.hand2 = hand2;
+    }
 
     public static PokerHands getInstance() {
         if (instance == null) {
@@ -146,6 +167,9 @@ public class PokerHands {
     }
 
     public void calculateHand(Hand hand) {
+        if (hand.hand.size() != HAND_SIZE) {
+            return;
+        }
         Map values = new HashMap<String, Integer>();
         String suit = "";
         boolean suited = true;
@@ -170,7 +194,7 @@ public class PokerHands {
         calculateHandFromCards(hand, values, suited);
     }
 
-    public Hand calculateHandFromCards(Hand hand, Map<String, Integer> values, boolean suited) {
+    public void calculateHandFromCards(Hand hand, Map<String, Integer> values, boolean suited) {
         // Check matching values
         for (Map.Entry<String, Integer> entry : values.entrySet()) {
             // Check four of a kind
@@ -237,8 +261,6 @@ public class PokerHands {
         else if (suited) {
             hand.type = HandTypes.FLUSH;
         }
-
-        return hand;
     }
 
     public String compareHands() {
